@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+#include <signal.h>
 
 // Length of one bar
 #ifndef WIDTH
@@ -18,11 +19,19 @@
 #define BARS 20
 #endif
 
+void quit(int){
+    printf("\x1b[?25h\x1b[1049l");
+    exit(0);
+}
+
 int main(){
+    signal(SIGINT, quit);
+    signal(SIGTERM, quit);
+
     srand(time(NULL));
     const char* colors[] = {"9", "10", "11", "12", "13"};
 
-    printf("\x1b[?1049h"); // Enter alternate terminal
+    printf("\x1b[?1049h\x1b[?25l"); // Enter alternate terminal
 
     while (1){
        printf("\x1b[H\x1b[2J");   // Clear the terminal before each frame
