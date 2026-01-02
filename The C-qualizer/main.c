@@ -1,3 +1,4 @@
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -18,22 +19,31 @@
 #define BARS 20
 #endif
 
-int main(){
-    srand(time(NULL));
-    const char* colors[] = {"9", "10", "11", "12", "13"};
+void quit(int) {
+  printf("\x1b[?25h\x1b[1049l");
+  exit(0);
+}
 
-    printf("\x1b[?1049h"); // Enter alternate terminal
+int main() {
+  signal(SIGINT, quit);
+  signal(SIGTERM, quit);
 
-    while (1){
-       printf("\x1b[H\x1b[2J");   // Clear the terminal before each frame
+  srand(time(NULL));
+  const char *colors[] = {"9", "10", "11", "12", "13"};
 
-        for(int i = 0; i < BARS; i++){
-            int h = rand() % WIDTH;
-            printf("\x1b[38;5;%sm", colors[i % 5]);
-            for (int j = 0; j < h; j++) putchar('|');
-            printf("\x1b[0m\n");
-        }
+  printf("\x1b[?1049h\x1b[?25l"); // Enter alternate terminal
 
-        usleep(TIME);
+  while (1) {
+    printf("\x1b[H\x1b[2J"); // Clear the terminal before each frame
+
+    for (int i = 0; i < BARS; i++) {
+      int h = rand() % WIDTH;
+      printf("\x1b[38;5;%sm", colors[i % 5]);
+      for (int j = 0; j < h; j++)
+        putchar('|');
+      printf("\x1b[0m\n");
     }
+
+    usleep(TIME);
+  }
 }
